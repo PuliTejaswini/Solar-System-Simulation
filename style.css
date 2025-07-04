@@ -141,7 +141,7 @@ body.light .planet-label {
   font-weight: 600;
   transition: background-color 0.3s ease;
 }
-
+/* 
 #toggleAnimation:hover {
   background-color: #666;
 }
@@ -153,7 +153,7 @@ body.light #toggleAnimation {
 
 body.light #toggleAnimation:hover {
   background-color: #aaa;
-}
+} */
 .planet-label {
   position: fixed;
   background: rgba(0, 0, 0, 0.6);
