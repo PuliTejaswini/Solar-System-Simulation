@@ -1,4 +1,8 @@
+// Wait for the DOM to load before initializing the 3D scene
 window.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM fully loaded. Initializing scene...');
+
+  // Initialize core Three.js components: scene, camera, and renderer
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({
@@ -6,11 +10,15 @@ window.addEventListener('DOMContentLoaded', () => {
     antialias: true,
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  console.log('Renderer, scene, and camera initialized');
 
+  // Set default camera position and orientation
   const defaultCameraPosition = new THREE.Vector3(0, 20, 60);
   camera.position.copy(defaultCameraPosition);
   camera.lookAt(0, 0, 0);
+  console.log('Camera set to default position');
 
+  // Create star field for background effect
   const starGeometry = new THREE.BufferGeometry();
   const starCount = 5000;
   const starPositions = new Float32Array(starCount * 3);
@@ -21,16 +29,22 @@ window.addEventListener('DOMContentLoaded', () => {
   const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 1 });
   const starField = new THREE.Points(starGeometry, starMaterial);
   scene.add(starField);
+  console.log('Star field added to scene');
 
+  // Lighting setup: ambient and point light
   scene.add(new THREE.AmbientLight(0xffffff, 0.2));
   scene.add(new THREE.PointLight(0xffffff, 1.5));
+  console.log('Lights added to scene');
 
+  // Create the sun
   const sun = new THREE.Mesh(
     new THREE.SphereGeometry(3, 32, 32),
     new THREE.MeshBasicMaterial({ color: 0xffcc00 })
   );
   scene.add(sun);
+  console.log('Sun added to scene');
 
+  // Planet configuration
   const planetData = [
     { name: 'Mercury', color: 0xaaaaaa, distance: 6, size: 0.3 },
     { name: 'Venus', color: 0xffaa00, distance: 8, size: 0.6 },
@@ -42,28 +56,30 @@ window.addEventListener('DOMContentLoaded', () => {
     { name: 'Neptune', color: 0x3333ff, distance: 28, size: 1.0 },
   ];
 
+  // Arrays and helpers
   const planets = [];
-  const speeds = {};
+  const speeds = {}; // Each planet's orbital speed
   const labels = [];
   const controls = document.getElementById('controls');
-
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster(); // For interaction
+  const mouse = new THREE.Vector2(); // Mouse position normalized
   let hoveredIndex = -1;
 
-  planetData.forEach((data) => {
+  // Create planet meshes, speeds, labels, and UI controls
+  planetData.forEach((data, index) => {
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(data.size, 32, 32),
       new THREE.MeshStandardMaterial({ color: data.color })
     );
     mesh.userData = {
-      angle: Math.random() * Math.PI * 2,
+      angle: Math.random() * Math.PI * 2, // Random orbit start
       distance: data.distance,
     };
     scene.add(mesh);
     planets.push(mesh);
-    speeds[data.name] = 0.01 + Math.random() * 0.01;
+    speeds[data.name] = 0.01 + Math.random() * 0.01; // Random orbit speed
 
+    // Create label for planet
     const label = document.createElement('div');
     label.className = 'planet-label';
     label.innerText = data.name;
@@ -71,6 +87,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(label);
     labels.push(label);
 
+    // Create slider to control speed
     const group = document.createElement('div');
     group.className = 'control-group';
     group.innerHTML = `
@@ -78,10 +95,14 @@ window.addEventListener('DOMContentLoaded', () => {
       <input type="range" min="0.001" max="0.05" step="0.001" value="${speeds[data.name]}">
     `;
     const input = group.querySelector('input');
-    input.oninput = () => (speeds[data.name] = parseFloat(input.value));
+    input.oninput = () => {
+      speeds[data.name] = parseFloat(input.value);
+      console.log(`Speed of ${data.name} changed to ${speeds[data.name]}`);
+    };
     controls.appendChild(group);
   });
 
+  // Pause/Resume animation button
   const pauseBtn = document.createElement('button');
   pauseBtn.id = 'toggleAnimation';
   pauseBtn.className = 'btn';
@@ -92,12 +113,16 @@ window.addEventListener('DOMContentLoaded', () => {
   pauseBtn.addEventListener('click', () => {
     paused = !paused;
     pauseBtn.innerText = paused ? 'Resume' : 'Pause';
+    console.log(`Animation ${paused ? 'paused' : 'resumed'}`);
   });
 
+  // Toggle light/dark theme
   document.getElementById('themeToggle').addEventListener('click', () => {
     document.body.classList.toggle('light');
+    console.log('Theme toggled');
   });
 
+  // Camera reset on double-click
   const defaultLookAt = new THREE.Vector3(0, 0, 0);
   const cameraStart = new THREE.Vector3();
   const cameraEnd = new THREE.Vector3();
@@ -107,6 +132,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('dblclick', () => {
     if (isResettingCamera) return;
     isResettingCamera = true;
+    console.log('Double click detected. Resetting camera...');
     cameraStart.copy(camera.position);
     cameraEnd.copy(defaultCameraPosition);
     startTime = performance.now();
@@ -116,12 +142,16 @@ window.addEventListener('DOMContentLoaded', () => {
       camera.position.lerpVectors(cameraStart, cameraEnd, t);
       camera.lookAt(defaultLookAt);
       if (t < 1) requestAnimationFrame(updateCamera);
-      else isResettingCamera = false;
+      else {
+        isResettingCamera = false;
+        console.log('Camera reset complete');
+      }
     }
 
     updateCamera();
   });
 
+  // Zoom camera to clicked planet
   let zooming = false;
   window.addEventListener('click', (event) => {
     if (zooming) return;
@@ -133,6 +163,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (intersects.length > 0) {
       const planet = intersects[0].object;
+      console.log(`Clicked on ${planetData[planets.indexOf(planet)].name}`);
       zooming = true;
       const targetPosition = planet.position.clone().add(new THREE.Vector3(0, 2, 5));
       const startPosition = camera.position.clone();
@@ -144,13 +175,17 @@ window.addEventListener('DOMContentLoaded', () => {
         camera.position.lerpVectors(startPosition, targetPosition, t);
         camera.lookAt(lookAtTarget);
         if (t < 1) requestAnimationFrame(animateZoom);
-        else zooming = false;
+        else {
+          zooming = false;
+          console.log('Zoom animation complete');
+        }
       }
 
       animateZoom();
     }
   });
 
+  // Hover detection for label visibility
   window.addEventListener('mousemove', (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -164,9 +199,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Animation loop
   function animate() {
     requestAnimationFrame(animate);
 
+    // Rotate planets around the sun
     if (!paused) {
       planets.forEach((planet, i) => {
         const speed = speeds[planetData[i].name];
@@ -176,7 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Update label position
+    // Update label positions on hover
     labels.forEach((label, i) => {
       if (i === hoveredIndex) {
         const pos = planets[i].position.clone().project(camera);
@@ -195,7 +232,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   animate();
 
+  // Handle window resize events
   window.addEventListener('resize', () => {
+    console.log('Window resized. Updating camera and renderer...');
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
