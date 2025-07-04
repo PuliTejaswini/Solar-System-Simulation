@@ -1,0 +1,174 @@
+/* Reset and base styles */
+body, html {
+  margin: 0; padding: 0; height: 100%;
+  overflow: hidden;
+  background-color: #0d0d0d;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+
+body.light {
+  background-color: #f0f0f0;
+  color: #222;
+}
+
+h1 {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Canvas fills screen */
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Controls panel */
+.controls {
+  position: fixed;
+  top: 60px;
+  left: 20px;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 12px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 220px;
+  box-sizing: border-box;
+}
+
+body.light .controls {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #222;
+}
+
+.control-group {
+  margin-bottom: 12px;
+}
+
+.control-group label {
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  position: fixed;
+  top: 34px;
+  right: 20px;
+  /* margin-left: ; */
+  padding: 6px 12px;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 10;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #444;
+}
+
+body.light .btn {
+  background-color: #ddd;
+  color: #222;
+}
+
+body.light .btn:hover {
+  background-color: #bbb;
+}
+
+/* Planet labels */
+.planet-label {
+  position: fixed;
+  color: white;
+  font-size: 12px;
+  pointer-events: none;
+  background: rgba(0,0,0,0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.light .planet-label {
+  background: rgba(255,255,255,0.8);
+  color: #222;
+}
+/* Add this at the bottom of your CSS */
+.control-btn {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  padding: 6px 0;
+  background-color: #333;
+}
+
+.control-btn:hover {
+  background-color: #555;
+}
+
+#toggleAnimation {
+  margin-top: 50px;
+  margin-right: -5px;
+  padding: 6px 5px;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 20%;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+#toggleAnimation:hover {
+  background-color: #666;
+}
+
+body.light #toggleAnimation {
+  background-color: #ccc;
+  color: #222;
+}
+
+body.light #toggleAnimation:hover {
+  background-color: #aaa;
+}
+.planet-label {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  opacity: 0;
+  z-index: 20;
+}
+
+body.light .planet-label {
+  background: rgba(255, 255, 255, 0.8);
+  color: #222;
+}
